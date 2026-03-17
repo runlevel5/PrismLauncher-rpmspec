@@ -58,7 +58,7 @@ BuildRequires:    lld
 # https://fedoraproject.org/wiki/Changes/ThirdPartyLegacyJdks
 # https://adoptium.net/installation/linux/#_centosrhelfedora_instructions
 %if 0%{?fedora} > 41
-BuildRequires:    java-21-openjdk-devel
+BuildRequires:    java-25-openjdk-devel
 %else
 BuildRequires:    java-17-openjdk-devel
 %endif
