@@ -39,8 +39,8 @@ spectool -g -R ~/rpmbuild/SPECS/prismlauncher.spec
 Or download manually:
 
 ```bash
-curl -L -o ~/rpmbuild/SOURCES/PrismLauncher-10.0.5.tar.gz \
-  https://github.com/PrismLauncher/PrismLauncher/releases/download/10.0.5/PrismLauncher-10.0.5.tar.gz
+curl -L -o ~/rpmbuild/SOURCES/PrismLauncher-11.0.2.tar.gz \
+  https://github.com/PrismLauncher/PrismLauncher/releases/download/11.0.2/PrismLauncher-11.0.2.tar.gz
 ```
 
 ### 4. Install build dependencies
@@ -73,13 +73,13 @@ rpmbuild -ba ~/rpmbuild/SPECS/prismlauncher.spec
 Once the build completes, the RPM will be at:
 
 ```
-~/rpmbuild/RPMS/ppc64le/prismlauncher-10.0.5-*.ppc64le.rpm
+~/rpmbuild/RPMS/ppc64le/prismlauncher-11.0.2-*.ppc64le.rpm
 ```
 
 Install it with:
 
 ```bash
-sudo dnf install ~/rpmbuild/RPMS/ppc64le/prismlauncher-10.0.5-*.ppc64le.rpm
+sudo dnf install ~/rpmbuild/RPMS/ppc64le/prismlauncher-11.0.2-*.ppc64le.rpm
 ```
 
 ## Bumping to a new version

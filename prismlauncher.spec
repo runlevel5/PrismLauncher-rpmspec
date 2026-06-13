@@ -31,7 +31,7 @@
 %endif
 
 Name:             prismlauncher
-Version:          10.0.5
+Version:          11.0.2
 Release:          %autorelease
 # See COPYING.md for more information
 # Each file in the source tree also contains a SPDX-License-Identifier header
@@ -40,6 +40,9 @@ Group:            Amusements/Games
 Summary:          Minecraft launcher with ability to manage multiple instances
 Source:           https://github.com/PrismLauncher/PrismLauncher/releases/download/%{version}/PrismLauncher-%{version}.tar.gz
 Patch0:           prismlauncher-java-source-target-8.patch
+# GCC 16 (Fedora 44+) adds -Wsfinae-incomplete, which the upstream
+# -Werror build promotes to a hard error. Drop -Werror for distro builds.
+Patch1:           prismlauncher-no-werror.patch
 URL:              https://prismlauncher.org/
 
 BuildRequires:    cmake >= 3.22
@@ -170,7 +173,7 @@ appstream-util validate-relax --nonet \
 %{_datadir}/applications/org.prismlauncher.PrismLauncher.desktop
 %{_datadir}/icons/hicolor/scalable/apps/org.prismlauncher.PrismLauncher.svg
 %{_datadir}/icons/hicolor/256x256/apps/org.prismlauncher.PrismLauncher.png
-%{_datadir}/mime/packages/modrinth-mrpack-mime.xml
+%{_datadir}/mime/packages/org.prismlauncher.PrismLauncher.xml
 %{_datadir}/qlogging-categories?/prismlauncher.categories
 %{_mandir}/man?/prismlauncher.*
 %{_metainfodir}/org.prismlauncher.PrismLauncher.metainfo.xml
