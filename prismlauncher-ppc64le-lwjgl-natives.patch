@@ -1,0 +1,237 @@
+--- a/launcher/minecraft/OneSixVersionFormat.cpp
++++ b/launcher/minecraft/OneSixVersionFormat.cpp
+@@ -197,6 +197,234 @@
+         readLibs("+libraries", out->libraries);
+     }
+ 
++#if defined(__powerpc64__)
++    // Linux ppc64le: Prism's metadata does not provide LWJGL ppc64le natives,
++    // so Minecraft has no usable native libraries on this architecture out of the
++    // box. Inject the ppc64le natives for LWJGL 3.4.1 (used by Minecraft 26.1.2).
++    // Every entry's "rules" gate it to the "linux-ppc64le" classifier, so the
++    // libraries are inert on any other architecture. The core jar points at a build
++    // with the libffi FFI_DEFAULT_ABI fix (LWJGL/lwjgl3#1126); the remaining jars
++    // are the official build.lwjgl.org ppc64le artifacts.
++    if (out->uid == "org.lwjgl3" && out->version == "3.4.1") {
++        bool alreadyPresent = false;
++        for (const auto& existing : out->libraries) {
++            if (existing->rawName().artifactId().contains("natives-linux-ppc64le")) {
++                alreadyPresent = true;
++                break;
++            }
++        }
++        if (!alreadyPresent) {
++            static const char s_lwjgl3_ppc64le_natives[] = R"PPC64LE(
++[
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "0a0f9e0786ac92af25a87f5d85e39dd5e97e88d2",
++        "size": 1571928,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-freetype/lwjgl-freetype-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-freetype-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "bc165ef4d776367fd8d70d83b6ebac3647fb022a",
++        "size": 159608,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-glfw/lwjgl-glfw-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-glfw-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "7995638f1055569bfb4facbe2df6324e1be1f791",
++        "size": 283777,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-jemalloc/lwjgl-jemalloc-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-jemalloc-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "075aeeb970f9a5037f89e57aec008a71bcfb100e",
++        "size": 141955,
++        "url": "https://github.com/runlevel5/lwjgl3/releases/download/3.4.1-ppc64-fix/lwjgl-natives-linux-ppc64le-3.4.1-lwjgl.1-ppcfix.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "381695404149f3c391ac17311b9412f09ae025f7",
++        "size": 945566,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-openal/lwjgl-openal-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-openal-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "ebf11c3871d74692113c32566f7e6c44ec5cd25c",
++        "size": 86204,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-opengl/lwjgl-opengl-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-opengl-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "c88f770f6be38c87f84f38ae1d170050a1098316",
++        "size": 3920177,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-shaderc/lwjgl-shaderc-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-shaderc-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "1b9e3423241f56e61394857f71bfa5faf5c0ea30",
++        "size": 1258573,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-spvc/lwjgl-spvc-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-spvc-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "30e5e4e55929558e5ad5de63c5f9d9ab093f015c",
++        "size": 336030,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-stb/lwjgl-stb-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-stb-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "3c7013fb73f11fff9c025e999b49d91555186c95",
++        "size": 56658,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-tinyfd/lwjgl-tinyfd-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-tinyfd-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  },
++  {
++    "downloads": {
++      "artifact": {
++        "sha1": "9411a054eca2901835d380b819c01dc606cb1302",
++        "size": 71732,
++        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-vma/lwjgl-vma-natives-linux-ppc64le.jar"
++      }
++    },
++    "name": "org.lwjgl:lwjgl-vma-natives-linux-ppc64le:3.4.1-lwjgl.1",
++    "rules": [
++      {
++        "action": "allow",
++        "os": {
++          "name": "linux-ppc64le"
++        }
++      }
++    ]
++  }
++]
++)PPC64LE";
++            const auto ppcDoc = QJsonDocument::fromJson(QByteArray::fromRawData(
++                s_lwjgl3_ppc64le_natives, sizeof(s_lwjgl3_ppc64le_natives) - 1));
++            for (const auto& val : ppcDoc.array()) {
++                out->libraries.append(libraryFromJson(*out, val.toObject(), filename));
++            }
++        }
++    }
++#endif
++
+     if (root.contains("mavenFiles")) {
+         readLibs("mavenFiles", out->mavenFiles);
+     }

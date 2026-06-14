@@ -43,6 +43,11 @@ Patch0:           prismlauncher-java-source-target-8.patch
 # GCC 16 (Fedora 44+) adds -Wsfinae-incomplete, which the upstream
 # -Werror build promotes to a hard error. Drop -Werror for distro builds.
 Patch1:           prismlauncher-no-werror.patch
+# Prism's metadata ships no LWJGL ppc64le natives, so Minecraft 26.1.2
+# (LWJGL 3.4.1) has no usable native libraries on ppc64le. Inject them when
+# the org.lwjgl3 3.4.1 component is parsed (ppc64le builds only). See
+# LWJGL/lwjgl3#1126 for the libffi fix carried by the core jar.
+Patch2:           prismlauncher-ppc64le-lwjgl-natives.patch
 URL:              https://prismlauncher.org/
 
 BuildRequires:    cmake >= 3.22

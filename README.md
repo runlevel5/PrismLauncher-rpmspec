@@ -9,11 +9,24 @@ The upstream Copr repository [g3tchoo/prismlauncher](https://copr.fedorainfraclo
 1. **Java BuildRequires**: The upstream spec uses `temurin-17-jdk` (Adoptium) for Fedora > 41, which is not available for ppc64le. We replace it with `java-21-openjdk-devel`.
 2. **Java source/target patch**: The bundled Java components (`libraries/launcher` and `libraries/javacheck`) set `-source 7 -target 7` for javac. JDK 21+ no longer supports source/target level 7 (minimum is 8). The patch `prismlauncher-java-source-target-8.patch` bumps these to `-source 8 -target 8`.
 3. **Explicit `-p1` in `%autosetup`**: Added to ensure the patch applies correctly.
+4. **LWJGL ppc64le natives**: Prism's metadata server ships no LWJGL ppc64le
+   natives, so on ppc64le modern Minecraft (26.1.2 / LWJGL 3.4.1) has no usable
+   native libraries and crashes at startup. The patch
+   `prismlauncher-ppc64le-lwjgl-natives.patch` injects the 11 ppc64le native
+   libraries into the `org.lwjgl3` 3.4.1 component when it is parsed, so instances
+   work out of the box with no manual JSON editing. The injected entries are gated
+   by `rules` to the `linux-ppc64le` classifier (inert on other architectures) and
+   the whole block is compiled only for `__powerpc64__` builds. The core jar points
+   at a build carrying the libffi `FFI_DEFAULT_ABI` fix
+   ([LWJGL/lwjgl3#1126](https://github.com/LWJGL/lwjgl3/issues/1126)); the other 10
+   are the official `build.lwjgl.org` ppc64le artifacts.
 
 ## Files
 
 - `prismlauncher.spec` - The RPM spec file
 - `prismlauncher-java-source-target-8.patch` - Patch to fix Java source/target compatibility
+- `prismlauncher-no-werror.patch` - Drop `-Werror` so GCC 16 (Fedora 44+) warnings don't fail the build
+- `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives into the `org.lwjgl3` 3.4.1 component
 
 ## Build instructions
 
@@ -27,7 +40,7 @@ mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 ```bash
 cp prismlauncher.spec ~/rpmbuild/SPECS/
-cp prismlauncher-java-source-target-8.patch ~/rpmbuild/SOURCES/
+cp *.patch ~/rpmbuild/SOURCES/
 ```
 
 ### 3. Download the source tarball
