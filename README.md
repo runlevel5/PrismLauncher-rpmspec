@@ -16,29 +16,24 @@ The upstream Copr repository [g3tchoo/prismlauncher](https://copr.fedorainfraclo
    libraries into the `org.lwjgl3` 3.4.1 component when it is parsed, so instances
    work out of the box with no manual JSON editing. The injected entries are gated
    by `rules` to the `linux-ppc64le` classifier (inert on other architectures) and
-   the whole block is compiled only for `__powerpc64__` builds. The core jar points
-   at a build carrying the libffi `FFI_DEFAULT_ABI` fix
-   ([LWJGL/lwjgl3#1126](https://github.com/LWJGL/lwjgl3/issues/1126)); the other 10
-   are the official `build.lwjgl.org` ppc64le artifacts.
-5. **System OpenAL on ppc64le**: the bundled LWJGL OpenAL native crashes in a
-   libc exit handler during shutdown on ppc64le (`SIGSEGV` in
-   `__run_exit_handlers`; the game runs and saves, only teardown faults). The
-   patch `prismlauncher-ppc64le-system-openal.patch` defaults `UseNativeOpenAL`
-   to `true` and `CustomOpenALPath` to `/usr/lib64/libopenal.so.1` on ppc64le
-   builds, so the launcher uses Fedora's `openal-soft` (added as a `Requires`)
-   instead. The explicit SONAME path avoids depending on the `openal-soft-devel`
-   symlink that Prism's `dlopen`-based detection would otherwise need. Existing
-   installs that already persisted `UseNativeOpenAL=false` must enable
-   "Use system installation of OpenAL" once, or clear that key from
-   `prismlauncher.cfg`.
+   the whole block is compiled only for `__powerpc64__` builds. Two of the entries
+   point at corrected, self-contained jars (hosted on a GitHub release) because the
+   official `build.lwjgl.org` ppc64le artifacts are broken:
+   - the **core** jar carries the libffi `FFI_DEFAULT_ABI` fix
+     ([LWJGL/lwjgl3#1126](https://github.com/LWJGL/lwjgl3/issues/1126));
+   - the **openal** jar is rebuilt with GCC 14 — the official one crashes in a
+     libc exit handler during shutdown (`SIGSEGV` in `__run_exit_handlers`),
+     because LWJGL's CI builds OpenAL Soft 1.25.x with GCC 12, which is too old
+     (it needs `std::format`, GCC 13+) and miscompiles the ppc64le exit teardown.
+
+   The other nine modules use the official `build.lwjgl.org` ppc64le artifacts.
 
 ## Files
 
 - `prismlauncher.spec` - The RPM spec file
 - `prismlauncher-java-source-target-8.patch` - Patch to fix Java source/target compatibility
 - `prismlauncher-no-werror.patch` - Drop `-Werror` so GCC 16 (Fedora 44+) warnings don't fail the build
-- `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives into the `org.lwjgl3` 3.4.1 component
-- `prismlauncher-ppc64le-system-openal.patch` - Default to system OpenAL on ppc64le (bundled native crashes on exit)
+- `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives (core + openal from corrected jars) into the `org.lwjgl3` 3.4.1 component
 
 ## Build instructions
 

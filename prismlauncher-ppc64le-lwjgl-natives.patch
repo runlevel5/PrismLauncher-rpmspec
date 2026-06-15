@@ -98,9 +98,9 @@
 +  {
 +    "downloads": {
 +      "artifact": {
-+        "sha1": "381695404149f3c391ac17311b9412f09ae025f7",
-+        "size": 945566,
-+        "url": "https://build.lwjgl.org/release/3.4.1/bin/lwjgl-openal/lwjgl-openal-natives-linux-ppc64le.jar"
++        "sha1": "f7e5c2be521111fc2abd6d45864045dd517f1f44",
++        "size": 1046577,
++        "url": "https://github.com/runlevel5/lwjgl3/releases/download/3.4.1-ppc64-fix/lwjgl-openal-natives-linux-ppc64le-3.4.1-lwjgl.1-ppcfix.jar"
 +      }
 +    },
 +    "name": "org.lwjgl:lwjgl-openal-natives-linux-ppc64le:3.4.1-lwjgl.1",

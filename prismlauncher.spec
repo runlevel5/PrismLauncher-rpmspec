@@ -48,9 +48,6 @@ Patch1:           prismlauncher-no-werror.patch
 # the org.lwjgl3 3.4.1 component is parsed (ppc64le builds only). See
 # LWJGL/lwjgl3#1126 for the libffi fix carried by the core jar.
 Patch2:           prismlauncher-ppc64le-lwjgl-natives.patch
-# The bundled LWJGL OpenAL native crashes in a libc exit handler on ppc64le
-# shutdown (SIGSEGV). Default to the system openal-soft on ppc64le builds.
-Patch3:           prismlauncher-ppc64le-system-openal.patch
 URL:              https://prismlauncher.org/
 
 BuildRequires:    cmake >= 3.22
@@ -115,13 +112,6 @@ Suggests:         java-1.8.0-openjdk
 Requires:         pciutils
 # Ditto, but with `glxinfo`
 Requires:         mesa-demos
-
-# ppc64le: the bundled LWJGL OpenAL native crashes in a libc exit handler on
-# shutdown. prismlauncher-ppc64le-system-openal.patch defaults to the system
-# OpenAL (/usr/lib64/libopenal.so.1), which openal-soft provides.
-%ifarch ppc64le
-Requires:         openal-soft
-%endif
 
 # Needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
 Recommends:       xrandr
