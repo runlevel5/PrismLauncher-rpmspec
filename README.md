@@ -64,6 +64,25 @@ To reproduce the SRPM step locally (e.g. on a Fedora box, run from the repo root
 make -f .copr/Makefile srpm outdir=/tmp/srpm
 ```
 
+### RHEL / CentOS Stream / EPEL chroots need EPEL + CRB
+
+Several `BuildRequires` (`extra-cmake-modules`, `tomlplusplus-devel`, `scdoc`,
+`qrencode-devel`, …) are **not** in RHEL 10 base/AppStream — they live in EPEL 10,
+which itself depends on the CRB (CodeReady Builder) repo. COPR's EL chroots do not
+enable these by default, so builds fail with `No matching package to install:
+'extra-cmake-modules'` (or similar). This is a buildroot configuration issue, not a
+spec issue — it cannot be fixed from `.spec` or `.copr/Makefile`.
+
+Fix it in the COPR project: edit the EL chroot (e.g. `epel-10-x86_64`) and add to
+its **"Repos" / "External repositories"** field:
+
+```
+https://dl.fedoraproject.org/pub/epel/10/Everything/$basearch/
+https://mirror.stream.centos.org/10-stream/CRB/$basearch/os/
+```
+
+Fedora chroots ship all of these in the base repos and need no extra config.
+
 ## Build instructions
 
 ### 1. Set up the RPM build tree
