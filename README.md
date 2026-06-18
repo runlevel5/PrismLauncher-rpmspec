@@ -6,6 +6,29 @@ The upstream Copr repository [g3tchoo/prismlauncher](https://copr.fedorainfraclo
 
 Having said that this RPM version also work fine with x86_64 and aarch64 and tend to be more up-to-date.
 
+## Installing from COPR
+
+Prebuilt packages are published to the
+[`tle/PrismLauncher`](https://copr.fedorainfracloud.org/coprs/tle/PrismLauncher/)
+COPR repository. Enable it and install:
+
+```bash
+sudo dnf copr enable tle/PrismLauncher
+sudo dnf install prismlauncher
+```
+
+To update later, a normal `sudo dnf upgrade` picks up new builds. To remove the
+repository:
+
+```bash
+sudo dnf copr remove tle/PrismLauncher
+```
+
+> **RHEL / CentOS Stream (EL) users:** the EL chroots also need EPEL and CRB
+> enabled, since some dependencies are not in the base repos — see
+> [Building on Fedora COPR](#building-on-fedora-copr) below. Fedora (including
+> ppc64le) needs nothing extra.
+
 ## What is changed from the upstream spec
 
 1. **Java BuildRequires**: The upstream spec uses `temurin-17-jdk` (Adoptium) for Fedora > 41, which is not available for ppc64le. We replace it with `java-21-openjdk-devel`.
