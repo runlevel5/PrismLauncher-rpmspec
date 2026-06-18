@@ -66,19 +66,32 @@ make -f .copr/Makefile srpm outdir=/tmp/srpm
 
 ### RHEL / CentOS Stream / EPEL chroots need EPEL + CRB
 
-Several `BuildRequires` (`extra-cmake-modules`, `tomlplusplus-devel`, `scdoc`,
-`qrencode-devel`, …) are **not** in RHEL 10 base/AppStream — they live in EPEL 10,
-which itself depends on the CRB (CodeReady Builder) repo. COPR's EL chroots do not
-enable these by default, so builds fail with `No matching package to install:
-'extra-cmake-modules'` (or similar). This is a buildroot configuration issue, not a
-spec issue — it cannot be fixed from `.spec` or `.copr/Makefile`.
+Several build dependencies are **not** in RHEL base/AppStream and must come from
+EPEL and/or the CRB (CodeReady Builder) repo, which COPR's EL chroots do not enable
+by default. Symptoms (per EL version):
 
-Fix it in the COPR project: edit the EL chroot (e.g. `epel-10-x86_64`) and add to
-its **"Repos" / "External repositories"** field:
+- EL10: `No matching package to install: 'extra-cmake-modules'` — EPEL provides
+  `extra-cmake-modules`, `tomlplusplus-devel`, `scdoc`, `qrencode-devel`, …
+- EL9: `No matching package to install: 'cmake(Qt6Concurrent) >= 6.2'` and
+  `'cmark'` — the Qt6 `-devel` packages live in CRB; `cmark` (the binary the spec
+  needs for `rhel < 10`) lives in EPEL.
+
+This is a buildroot configuration issue, not a spec issue — it cannot be fixed from
+`.spec` or `.copr/Makefile`. Fix it in the COPR project: edit the EL chroot and add
+to its **"Repos" / "External repositories"** field both EPEL and CRB.
+
+EL10 (`epel-10-x86_64`):
 
 ```
 https://dl.fedoraproject.org/pub/epel/10/Everything/$basearch/
 https://mirror.stream.centos.org/10-stream/CRB/$basearch/os/
+```
+
+EL9 (`epel-9-x86_64`):
+
+```
+https://dl.fedoraproject.org/pub/epel/9/Everything/$basearch/
+https://mirror.stream.centos.org/9-stream/CRB/$basearch/os/
 ```
 
 Fedora chroots ship all of these in the base repos and need no extra config.
