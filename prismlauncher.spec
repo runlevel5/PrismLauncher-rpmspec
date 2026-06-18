@@ -32,7 +32,7 @@
 
 Name:             prismlauncher
 Version:          11.0.2
-Release:          %autorelease
+Release:          1%{?dist}
 # See COPYING.md for more information
 # Each file in the source tree also contains a SPDX-License-Identifier header
 License:          GPL-3.0-only AND Apache-2.0 AND LGPL-3.0-only AND OFL-1.1 AND LGPL-2.1 AND MIT AND BSD-3-Clause
@@ -52,6 +52,10 @@ Patch2:           prismlauncher-ppc64le-lwjgl-natives.patch
 # EPEL/RHEL (only EPEL 8). Gate it behind -DLauncher_ENABLE_FERAL_GAMEMODE so EL
 # builds (where gamemode is unavailable) can drop the dependency. See %build.
 Patch3:           prismlauncher-gamemode-optional.patch
+# EPEL 9's cmark installs its CMake export as cmark.cmake, which
+# find_package(cmark) cannot consume, so configure fails even with cmark-devel.
+# Fall back to pkg-config (libcmark) when the CMake config is absent.
+Patch4:           prismlauncher-cmark-pkgconfig-fallback.patch
 URL:              https://prismlauncher.org/
 
 BuildRequires:    cmake >= 3.22
@@ -200,4 +204,8 @@ appstream-util validate-relax --nonet \
 
 
 %changelog
-%autochangelog
+* Thu Jun 18 2026 Trung Lê <trung.le@ruby-journal.com> - 11.0.2-1
+- Build for ppc64le and EL (RHEL/CentOS Stream) in addition to Fedora.
+- Make Feral GameMode optional so EL builds (no gamemode in EPEL) can disable it.
+- Use java-21-openjdk-devel on RHEL 10 (java-17 was dropped there).
+- Switch to a static Release and changelog for reliable COPR make_srpm builds.

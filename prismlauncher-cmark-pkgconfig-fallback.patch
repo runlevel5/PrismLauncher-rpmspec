@@ -1,0 +1,23 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f8e73ca..528fd46 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -301,7 +301,17 @@ if(Launcher_QT_VERSION_MAJOR EQUAL 6)
+     set(QT_LIBEXECS_DIR ${QT${QT_VERSION_MAJOR}_INSTALL_PREFIX}/${QT${QT_VERSION_MAJOR}_INSTALL_LIBEXECS})
+ endif()
+ 
+-find_package(cmark REQUIRED)
++# Prefer cmark's CMake package config, but fall back to pkg-config: older cmark
++# (e.g. EPEL 9) installs its export as cmark.cmake, which find_package(cmark)
++# cannot consume, so config mode fails even with cmark-devel present.
++find_package(cmark CONFIG QUIET)
++if(NOT cmark_FOUND)
++    find_package(PkgConfig REQUIRED)
++    pkg_check_modules(cmark REQUIRED IMPORTED_TARGET GLOBAL libcmark)
++    if(NOT TARGET cmark::cmark)
++        add_library(cmark::cmark ALIAS PkgConfig::cmark)
++    endif()
++endif()
+ 
+ option(Launcher_ENABLE_FERAL_GAMEMODE "Enable Feral Interactive's GameMode support (Linux only)" ON)
+ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND Launcher_ENABLE_FERAL_GAMEMODE)

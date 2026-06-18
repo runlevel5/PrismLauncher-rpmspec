@@ -59,6 +59,12 @@ sudo dnf copr remove tle/PrismLauncher
    are unchanged). On RHEL the spec drops the `pkgconfig(gamemode)` BuildRequires
    and configures with `-DLauncher_ENABLE_FERAL_GAMEMODE=OFF`; GameMode is a
    runtime-optional feature, so the resulting build simply lacks it.
+6. **cmark pkg-config fallback (for EL9 builds)**: EPEL 9's `cmark` installs its
+   CMake export as `cmark.cmake`, which `find_package(cmark)` cannot consume, so
+   configure fails even with `cmark-devel` present. The patch
+   `prismlauncher-cmark-pkgconfig-fallback.patch` makes the build fall back to
+   pkg-config (`libcmark`) when cmark's CMake package config is missing. It is a
+   no-op where the config exists (Fedora, EL10).
 
 ## Files
 
@@ -67,6 +73,7 @@ sudo dnf copr remove tle/PrismLauncher
 - `prismlauncher-no-werror.patch` - Drop `-Werror` so GCC 16 (Fedora 44+) warnings don't fail the build
 - `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives (core + openal from corrected jars) into the `org.lwjgl3` 3.4.1 component
 - `prismlauncher-gamemode-optional.patch` - Make Feral GameMode an optional CMake feature so EL builds (no `gamemode` in EPEL) can disable it
+- `prismlauncher-cmark-pkgconfig-fallback.patch` - Fall back to pkg-config for cmark when its CMake config is missing (EPEL 9)
 
 ## Building on Fedora COPR
 
@@ -83,11 +90,11 @@ from the git repo — no lookaside cache or manual tarball upload.
    make -f .copr/Makefile srpm outdir=<resultdir> spec=prismlauncher.spec
    ```
 
-   The Makefile installs `rpm-build`, `rpmdevtools` and `rpmautospec`, stages the
-   local `*.patch` files into `SOURCES/`, downloads the upstream release tarball
-   via `spectool`, and produces the SRPM. COPR then dispatches the per-chroot RPM
-   builds. `%autorelease` / `%autochangelog` are resolved from this repo's git
-   history at SRPM time.
+   The Makefile installs `rpm-build` and `rpmdevtools`, stages the local
+   `*.patch` files into `SOURCES/`, downloads the upstream release tarball via
+   `spectool`, and produces the SRPM. COPR then dispatches the per-chroot RPM
+   builds. The spec carries a static `Release` and `%changelog` (no rpmautospec),
+   so the SRPM is self-contained and builds deterministically across chroots.
 
 To reproduce the SRPM step locally (e.g. on a Fedora box, run from the repo root):
 

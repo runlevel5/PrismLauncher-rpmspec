@@ -12,9 +12,9 @@ SPEC    := prismlauncher.spec
 topdir  := $(CURDIR)/_build
 
 srpm:
-	# rpmdevtools provides spectool; rpmautospec resolves %autorelease /
-	# %autochangelog (which read this repo's git history) at SRPM build time.
-	dnf -y install rpm-build rpmdevtools rpmautospec git-core
+	# rpmdevtools provides spectool. The spec uses a static Release + changelog
+	# (no rpmautospec), so SRPM builds are self-contained and deterministic.
+	dnf -y install rpm-build rpmdevtools
 	mkdir -p $(topdir)/SOURCES
 	# The Patch entries are local files (no URL), so spectool will not fetch
 	# them. Stage them next to the about-to-be-downloaded tarball.
