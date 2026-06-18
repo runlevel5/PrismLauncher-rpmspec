@@ -77,24 +77,19 @@ by default. Symptoms (per EL version):
   needs for `rhel < 10`) lives in EPEL.
 
 This is a buildroot configuration issue, not a spec issue — it cannot be fixed from
-`.spec` or `.copr/Makefile`. Fix it in the COPR project: edit the EL chroot and add
-to its **"Repos" / "External repositories"** field both EPEL and CRB.
-
-EL10 (`epel-10-x86_64`):
-
-```
-https://dl.fedoraproject.org/pub/epel/10/Everything/$basearch/
-https://mirror.stream.centos.org/10-stream/CRB/$basearch/os/
-```
-
-EL9 (`epel-9-x86_64`):
+`.spec` or `.copr/Makefile`. Fix it in the COPR project: edit each EL chroot
+(`epel-9-x86_64`, `epel-10-x86_64`, …) and add to its **"Repos" / "External
+repositories"** field both EPEL and CRB. The same two lines work for every EL
+version — `$releasever` (9, 10, …) and `$basearch` are substituted per chroot:
 
 ```
-https://dl.fedoraproject.org/pub/epel/9/Everything/$basearch/
-https://mirror.stream.centos.org/9-stream/CRB/$basearch/os/
+https://dl.fedoraproject.org/pub/epel/$releasever/Everything/$basearch/
+https://mirror.stream.centos.org/$releasever-stream/CRB/$basearch/os/
 ```
 
-Fedora chroots ship all of these in the base repos and need no extra config.
+Add these per EL chroot, **not** project-wide: on a Fedora chroot `$releasever`
+would be a Fedora release (e.g. 41) for which these paths don't exist, breaking the
+build. Fedora chroots ship all of these in the base repos and need no extra config.
 
 ## Build instructions
 
