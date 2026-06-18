@@ -4,6 +4,8 @@
 
 The upstream Copr repository [g3tchoo/prismlauncher](https://copr.fedorainfracloud.org/coprs/g3tchoo/prismlauncher/) only builds for x86_64 and aarch64. There are no ppc64le builds available, so we maintain this spec file to build Prism Launcher locally on ppc64le machines running Fedora.
 
+Having said that this RPM version also work fine with x86_64 and aarch64 and tend to be more up-to-date.
+
 ## What is changed from the upstream spec
 
 1. **Java BuildRequires**: The upstream spec uses `temurin-17-jdk` (Adoptium) for Fedora > 41, which is not available for ppc64le. We replace it with `java-21-openjdk-devel`.
