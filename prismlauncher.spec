@@ -48,6 +48,10 @@ Patch1:           prismlauncher-no-werror.patch
 # the org.lwjgl3 3.4.1 component is parsed (ppc64le builds only). See
 # LWJGL/lwjgl3#1126 for the libffi fix carried by the core jar.
 Patch2:           prismlauncher-ppc64le-lwjgl-natives.patch
+# Feral GameMode is a hard CMake dependency upstream, but it is not packaged in
+# EPEL/RHEL (only EPEL 8). Gate it behind -DLauncher_ENABLE_FERAL_GAMEMODE so EL
+# builds (where gamemode is unavailable) can drop the dependency. See %build.
+Patch3:           prismlauncher-gamemode-optional.patch
 URL:              https://prismlauncher.org/
 
 BuildRequires:    cmake >= 3.22
@@ -68,12 +72,20 @@ BuildRequires:    lld
 %if 0%{?fedora} > 41
 BuildRequires:    java-25-openjdk-devel
 %else
+# RHEL 10 dropped java-17; it ships 21/25. EL9 and older Fedora still have 17.
+%if 0%{?rhel} >= 10
+BuildRequires:    java-21-openjdk-devel
+%else
 BuildRequires:    java-17-openjdk-devel
+%endif
 %endif
 BuildRequires:    desktop-file-utils
 BuildRequires:    libappstream-glib
 
+# gamemode is not in EPEL/RHEL; on EL we build with GameMode support disabled.
+%if !0%{?rhel}
 BuildRequires:    pkgconfig(gamemode)
+%endif
 BuildRequires:    pkgconfig(libarchive)
 BuildRequires:    pkgconfig(libcmark)
 # https://bugzilla.redhat.com/show_bug.cgi?id=2166815
@@ -140,6 +152,9 @@ multiple installations of Minecraft at once (Fork of MultiMC)
   %endif
   -DLauncher_QT_VERSION_MAJOR="%{qt_version}" \
   -DLauncher_BUILD_PLATFORM="%{build_platform}" \
+  %if 0%{?rhel}
+  -DLauncher_ENABLE_FERAL_GAMEMODE=OFF \
+  %endif
   %if 0%{?fedora} > 41
   -DLauncher_ENABLE_JAVA_DOWNLOADER=ON \
   %endif

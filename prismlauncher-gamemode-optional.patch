@@ -1,0 +1,79 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6b0d417..f8e73ca 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -303,7 +303,8 @@ endif()
+ 
+ find_package(cmark REQUIRED)
+ 
+-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++option(Launcher_ENABLE_FERAL_GAMEMODE "Enable Feral Interactive's GameMode support (Linux only)" ON)
++if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND Launcher_ENABLE_FERAL_GAMEMODE)
+     find_package(PkgConfig REQUIRED)
+     pkg_check_modules(gamemode REQUIRED IMPORTED_TARGET gamemode)
+ endif()
+diff --git a/launcher/Application.cpp b/launcher/Application.cpp
+index 115b648..bb66b06 100644
+--- a/launcher/Application.cpp
++++ b/launcher/Application.cpp
+@@ -131,8 +131,10 @@
+ #ifdef Q_OS_LINUX
+ #include <dlfcn.h>
+ #include "LibraryUtils.h"
++#ifdef WITH_FERAL_GAMEMODE
+ #include "gamemode_client.h"
+ #endif
++#endif
+ 
+ #if defined(Q_OS_LINUX)
+ #include <sys/statvfs.h>
+@@ -1838,8 +1840,10 @@ void Application::updateCapabilities()
+         m_capabilities |= SupportsFlame;
+ 
+ #ifdef Q_OS_LINUX
++#ifdef WITH_FERAL_GAMEMODE
+     if (gamemode_query_status() >= 0)
+         m_capabilities |= SupportsGameMode;
++#endif
+ 
+     if (!LibraryUtils::findMangoHud().isEmpty())
+         m_capabilities |= SupportsMangoHud;
+diff --git a/launcher/CMakeLists.txt b/launcher/CMakeLists.txt
+index c2f5e70..d1188c0 100644
+--- a/launcher/CMakeLists.txt
++++ b/launcher/CMakeLists.txt
+@@ -1356,10 +1356,11 @@ else()
+     target_link_libraries(Launcher_logic LibArchive::LibArchive)
+ endif()
+ 
+-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND Launcher_ENABLE_FERAL_GAMEMODE)
+     target_link_libraries(Launcher_logic
+         gamemode
+     )
++    target_compile_definitions(Launcher_logic PRIVATE WITH_FERAL_GAMEMODE)
+ endif()
+ 
+ target_link_libraries(Launcher_logic
+diff --git a/launcher/minecraft/launch/LauncherPartLaunch.cpp b/launcher/minecraft/launch/LauncherPartLaunch.cpp
+index a2c400e..66edd95 100644
+--- a/launcher/minecraft/launch/LauncherPartLaunch.cpp
++++ b/launcher/minecraft/launch/LauncherPartLaunch.cpp
+@@ -44,7 +44,7 @@
+ #include "launch/LaunchTask.h"
+ #include "minecraft/MinecraftInstance.h"
+ 
+-#ifdef Q_OS_LINUX
++#if defined(Q_OS_LINUX) && defined(WITH_FERAL_GAMEMODE)
+ #include "gamemode_client.h"
+ #endif
+ 
+@@ -149,7 +149,7 @@ void LauncherPartLaunch::executeTask()
+         m_process.start(javaPath, args);
+     }
+ 
+-#ifdef Q_OS_LINUX
++#if defined(Q_OS_LINUX) && defined(WITH_FERAL_GAMEMODE)
+     if (instance->settings()->get("EnableFeralGamemode").toBool() && APPLICATION->capabilities() & Application::SupportsGameMode) {
+         auto pid = m_process.processId();
+         if (pid) {

@@ -29,6 +29,13 @@ Having said that this RPM version also work fine with x86_64 and aarch64 and ten
      (it needs `std::format`, GCC 13+) and miscompiles the ppc64le exit teardown.
 
    The other nine modules use the official `build.lwjgl.org` ppc64le artifacts.
+5. **Optional GameMode (for EL builds)**: Upstream makes Feral GameMode a hard
+   CMake dependency on Linux, but `gamemode` is not packaged in EPEL/RHEL (only
+   EPEL 8). The patch `prismlauncher-gamemode-optional.patch` gates it behind a
+   `Launcher_ENABLE_FERAL_GAMEMODE` CMake option (default `ON`, so Fedora builds
+   are unchanged). On RHEL the spec drops the `pkgconfig(gamemode)` BuildRequires
+   and configures with `-DLauncher_ENABLE_FERAL_GAMEMODE=OFF`; GameMode is a
+   runtime-optional feature, so the resulting build simply lacks it.
 
 ## Files
 
@@ -36,6 +43,7 @@ Having said that this RPM version also work fine with x86_64 and aarch64 and ten
 - `prismlauncher-java-source-target-8.patch` - Patch to fix Java source/target compatibility
 - `prismlauncher-no-werror.patch` - Drop `-Werror` so GCC 16 (Fedora 44+) warnings don't fail the build
 - `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives (core + openal from corrected jars) into the `org.lwjgl3` 3.4.1 component
+- `prismlauncher-gamemode-optional.patch` - Make Feral GameMode an optional CMake feature so EL builds (no `gamemode` in EPEL) can disable it
 
 ## Building on Fedora COPR
 
