@@ -37,6 +37,33 @@ Having said that this RPM version also work fine with x86_64 and aarch64 and ten
 - `prismlauncher-no-werror.patch` - Drop `-Werror` so GCC 16 (Fedora 44+) warnings don't fail the build
 - `prismlauncher-ppc64le-lwjgl-natives.patch` - Inject LWJGL ppc64le natives (core + openal from corrected jars) into the `org.lwjgl3` 3.4.1 component
 
+## Building on Fedora COPR
+
+This repo ships a [`make_srpm`](https://docs.pagure.org/copr.copr/user_documentation.html#make-srpm)
+recipe at [`.copr/Makefile`](.copr/Makefile), so COPR can build the SRPM straight
+from the git repo — no lookaside cache or manual tarball upload.
+
+1. Create a COPR project and enable the `ppc64le` chroot (plus `x86_64` /
+   `aarch64` if wanted).
+2. Add a new package with **build method: "Make SRPM"** (a.k.a. `make_srpm`),
+   pointing at this git repository. COPR runs:
+
+   ```
+   make -f .copr/Makefile srpm outdir=<resultdir> spec=prismlauncher.spec
+   ```
+
+   The Makefile installs `rpm-build`, `rpmdevtools` and `rpmautospec`, stages the
+   local `*.patch` files into `SOURCES/`, downloads the upstream release tarball
+   via `spectool`, and produces the SRPM. COPR then dispatches the per-chroot RPM
+   builds. `%autorelease` / `%autochangelog` are resolved from this repo's git
+   history at SRPM time.
+
+To reproduce the SRPM step locally (e.g. on a Fedora box, run from the repo root):
+
+```bash
+make -f .copr/Makefile srpm outdir=/tmp/srpm
+```
+
 ## Build instructions
 
 ### 1. Set up the RPM build tree
